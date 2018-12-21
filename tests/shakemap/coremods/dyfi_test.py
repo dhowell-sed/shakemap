@@ -38,6 +38,7 @@ def test_geocoded():
         df, msg = _get_dyfi_dataframe(detail)
 
     np.testing.assert_almost_equal(df['INTENSITY'].sum(), 800.4)
+    np.testing.assert_almost_equal(df['STDDEV'].sum(), 47.71493647)
 
 
 def test_dyfi():
