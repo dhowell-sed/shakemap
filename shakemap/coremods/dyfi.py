@@ -29,7 +29,7 @@ channel_groups = [['[a-z]{2}e', '[a-z]{2}n', '[a-z]{2}z'],
                   ['h1', 'h2', 'z'],
                   ['unk']]
 pgm_cols = ['pga', 'pgv', 'psa03', 'psa10', 'psa30']
-optional = ['location', 'distance', 'reference', 'intensity', 'source', 'stddev']
+optional = ['location', 'distance', 'reference', 'intensity', 'source', 'intensity_stddev']
 
 # what are the DYFI columns and what do we rename them to?
 DYFI_COLUMNS_REPLACE = {
@@ -163,14 +163,14 @@ def _get_dyfi_dataframe(detail_or_url):
     df['source'] = "USGS (Did You Feel It?)"
     df.columns = df.columns.str.upper()
 
-    if 'STDDEV' not in df.columns: 
-        df['STDDEV'] = None
+    if 'INTENSITY_STDDEV' not in df.columns: 
+        df['INTENSITY_STDDEV'] = None
 
     # std = 0.09 + 0.25 e(-nresp / 24.02)
     def _compute_stddev_from_nresp(nresp):
         return np.exp(nresp.multiply(-1/24.02)).multiply(0.25).add(0.09)
 
-    df.loc[df.STDDEV.isna(),'STDDEV'] = _compute_stddev_from_nresp(df['NRESP'])
+    df.loc[df.INTENSITY_STDDEV.isna(),'INTENSITY_STDDEV'] = _compute_stddev_from_nresp(df['NRESP'])
 
     return (df, '')
 
