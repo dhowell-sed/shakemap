@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+
 import os
 import os.path
 import tempfile
@@ -6,7 +7,6 @@ import zipfile
 import json
 import glob
 import subprocess
-import shutil
 
 import numpy as np
 from osgeo import gdal
@@ -17,6 +17,7 @@ import pytest
 from shakemap.utils.config import get_config_paths
 from shakemap.coremods.model import ModelModule
 from shakemap.coremods.assemble import AssembleModule
+from shakemap.coremods.history import HistoryModule
 from shakemap.coremods.contour import ContourModule
 from shakemap.coremods.info import InfoModule
 from shakemap.coremods.raster import RasterModule
@@ -26,6 +27,7 @@ from shakemap.coremods.mapping import MappingModule
 from shakemap.coremods.plotregr import PlotRegr
 from shakemap.coremods.kml import KMLModule
 from shakemap.coremods.gridxml import GridXMLModule, _oq_to_gridxml
+from shakemap.coremods.shape import ShapeModule
 from impactutils.io.smcontainers import ShakeMapOutputContainer
 from shakelib.utils.imt_string import oq_to_file
 from mapio.shake import ShakeGrid
@@ -315,6 +317,16 @@ def test_products():
         oc = ShakeMapOutputContainer.load(res_file)
 
         #
+        # The history module just outputs some info to the operator, so
+        # here we just run it to make sure it doesn't crash anything.
+        # Actual testing should be done via bug reports/feature requests
+        # from users.
+        #
+        history = HistoryModule(evid)
+        history.execute()
+        del history
+
+        #
         # Test the creation of products -- currently not checking results
         # for validity or consistency, but probably should
         #
@@ -346,7 +358,13 @@ def test_products():
         mod = KMLModule(evid)
         mod.execute()
         mod.writeContents()
+        del mod
 
+        # This just exercises the ShapeModule code without actually
+        # checking for valid results.
+        mod = ShapeModule(evid)
+        mod.execute()
+        mod.writeContents()
         del mod
 
         #
